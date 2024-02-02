@@ -25,12 +25,12 @@ RUN chown -R 1001:1001 /.cache
 RUN chmod -R 777 /.cache
 
 # Copy any additional custom requirements, if necessary
-COPY actions/requirements-actions.txt ./
+COPY actions/requirements.txt ./
 
 # Install extra requirements for actions code, if necessary (uncomment next line)
 RUN pip install --upgrade pip
 RUN pip install --upgrade typing_extensions
-RUN pip install -r requirements-actions.txt
+RUN pip install -r requirements.txt
 
 
 # Copy actions folder to working directory
