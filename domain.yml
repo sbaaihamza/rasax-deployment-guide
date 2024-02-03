@@ -1,9 +1,9 @@
 version: "3.0"
 
 intents:
+
   - greet
   - goodbye
-  - affirm
   - deny
   - bot_challenge
   - Type
@@ -11,9 +11,12 @@ intents:
   - ask_navigate_data
   - ask_definition
   - inform_module
+  - inform_situation
+  - inform_question
   - rechoisir_module
   - paylod_definitions
-  
+
+
 actions:
     - action_stop_navigation
     - action_get_user_question
@@ -28,7 +31,6 @@ actions:
     - action_log_conversation
     - action_get_module_definitions2
 entities: 
-  - user_question
   - module_id
   - situation_id
   - question_id
@@ -37,13 +39,14 @@ slots:
     type: any
     mappings:
         - type: custom
+          # action: action_get_user_question
 
   user_question:
     type: text
 
     mappings:
-    - type: from_entity
-      entity: user_question
+    - type: custom
+      # action: action_get_user_question
 
   module_id:
     type: text
@@ -109,8 +112,6 @@ responses:
         payload: '/ask_definition'
       - title: أسئلة مباشرة أو كلمات رئيسية؟ 
         payload: "/ask_navigate_data" 
-
-
   utter_ask_me:
   - text: . يرجى طرح سؤالك
   - text: .لو سمحت، قدم سؤال 
@@ -119,28 +120,19 @@ responses:
   - text: .إذا كان لديك سؤال، لا تتردد في طرحه
   - text: .أنا هنا للإجابة على أسئلتك، لذا لا تتردد في طرحها
   - text: .سأكون سعيدًا بالاستماع إلى سؤالك
-
-
-
-
   utter_thanks:
   - text: 😊 كنت سعيدًا بالمساعدة 
   - text: 😊 بكل سرور سأكون في خدمتك 
   - text: 😊  تسرني مساعدتك  
-
-
-
   utter_goodbye:
   - text: وداعا أتمنى لك يوما سعيدا"
   - text:  الى اللقاء
-
   utter_asuwish:
   - text:  .حسنا كما تريد
   - text:  .حسناً كما تحب 
   - text:  .حسناً كما تشاء 
   - text:  .حسناً كما تُفَضِلُ 
   - text:  .حسناً كما يروق لك 
-
   utter_iamabot:
   - text: أنا مساعدك الرقمي في هذه الدورة التكوينية، ويمكنني الرد على إستفساراتك المتعلقة بالإحصاء وفقًا لقاعدة البيانات المتوفرة
 

@@ -18,9 +18,9 @@ import pandas as pd
 import json
 from functions import *
 
-static_data_path='mydata/static_data.json'
+
 # load static data from file
-definitions_dict, module_titles,choose_qst_variations,definitions_dict_old,other_qst_variations= load_data_from_file(static_data_path)
+definitions_dict, module_titles,choose_qst_variations,definitions_dict_old,other_qst_variations= load_data_from_file('my data/static_data.json')
 
 class ActionStopNavigation(Action):
     def name(self) -> str:
@@ -38,7 +38,7 @@ class ActionGetUserQuestion(Action):
         user_message_all = tracker.latest_message.get('text')
         # Generate recommendations
         try:
-            df_recommendations = provide_recommendations(user_message_all, THRESH=0.3, n=1000, unique_values_dict=unique_values_dict, BERT_weights=BERT_weights)
+            df_recommendations = provide_recommendations(user_message_all, THRESH=0.3, n=1000, unique_values_dict=unique_values_dict, BERT_weights=BERT_weights,n_module=n_module)
             dataframe_json = df_recommendations.to_json(orient='split')
         except Exception as e:
             print(e)
@@ -49,7 +49,7 @@ class ActionGetUserQuestion(Action):
             dispatcher.utter_message("من فضلك أعد صياغة سؤالك")
             return [SlotSet("user_question", user_message_all)]
         # Generate and send module buttons
-        module_ids, module_names = module_recommendations(df_recommendations, n=3)
+        module_ids, module_names = module_recommendations(df_recommendations, n=n_module)
         button_list = [{"title": name, "payload": f'/inform_module{{"module_id":"{str(module_id)}"}}'} for module_id, name in zip(module_ids, module_names)]
         dispatcher.utter_message(text="اختر الوحدة المتعلقة بسؤالك", buttons=button_list)
         # Set the user_question value in a slot for future use
@@ -67,6 +67,7 @@ class ActionReselectModule(Action):
             my_dataframe_slot = tracker.get_slot('my_dataframe_slot')
             df_recommendations = pd.read_json(my_dataframe_slot, orient='split')            
         except Exception as e:
+            print(e)
             dispatcher.utter_message(" !! خلل في تحميل البيانات")
             return []
         # Handle the case where no resp are found
@@ -74,7 +75,7 @@ class ActionReselectModule(Action):
             dispatcher.utter_message("من فضلك أعد صياغة سؤالك")
             return []
         # Generate and send module buttons
-        module_ids, module_names = module_recommendations(df_recommendations, n=3)
+        module_ids, module_names = module_recommendations(df_recommendations, n=n_module)
         button_list = [{"title": name, "payload": f'/inform_module{{"module_id":"{module_id}"}}'} 
                     for module_id, name in zip(module_ids, module_names)]
         dispatcher.utter_message(text="اختر الوحدة المتعلقة بسؤالك", buttons=button_list)
@@ -93,9 +94,9 @@ class ActionGetModuleId(Action):
     # Assuming you have only one entity in the latest message
             entity_name = latest_entities[0].get("entity")
             entity_value = latest_entities[0].get("value")
-
-        # Your action logic here
-        return [SlotSet(entity_name, entity_value)]
+            return [SlotSet(entity_name, entity_value)]
+        else:
+            return []
 
 
 class ActionGet_Situations(Action):
@@ -113,12 +114,12 @@ class ActionGet_Situations(Action):
             print(e)
             dispatcher.utter_message(" !! خلل في تحميل البيانات")#TODO: translate
             return []
-        situation_ids,situation_names=situation_recommendations(df_rslt,int(module_number),n=3)
+        situation_ids,situation_names=situation_recommendations(df_rslt,int(module_number),n=n_situation)
         if situation_ids==[]:
                         dispatcher.utter_message("لا يوجد السياق متاح في هذه الوحدة")
         else:
 
-            button_list = [{"title": situation_names[i], "payload": f'/inform_module{{"situation_id":"{str(situation_ids[i])}"}}'  } for i in range(len(situation_ids))]
+            button_list = [{"title": situation_names[i], "payload": f'/inform_situation{{"situation_id":"{str(situation_ids[i])}"}}'  } for i in range(len(situation_ids))]
             button_list.append({"title": "انقر هنا لإعادة إختيار الوحدة", "payload": '/rechoisir_module'})
             dispatcher.utter_message(text= "اختر السياق الأقرب إلى سؤالك",buttons=button_list)
         return []
@@ -135,8 +136,9 @@ class ActionGetsituationId(Action):
     # Assuming you have only one entity in the latest message
             entity_name = latest_entities[0].get("entity")
             entity_value = latest_entities[0].get("value")
-        # Your action logic here
-        return [SlotSet(entity_name, entity_value)]
+            return [SlotSet(entity_name, entity_value)]
+        else:
+            return []
 
 
 class ActionGet_Questions(Action):
@@ -150,15 +152,16 @@ class ActionGet_Questions(Action):
             my_dataframe_slot = tracker.get_slot('my_dataframe_slot')
             df_rslt = pd.read_json(my_dataframe_slot, orient='split')
         except Exception as e:
+            print(e)
             dispatcher.utter_message(" !! خلل في تحميل البيانات")
             return []
-        question_ids,question_names,reste,reste_question=question_recommendations(df_rslt,int(situation_number),n=5)
+        question_ids,question_names,reste,reste_question=question_recommendations(df_rslt,int(situation_number),n=n_question)
         if question_ids==[]:
                         dispatcher.utter_message("لا يوجد سؤال متاح في هذا السياق")
         else:
 
             random.shuffle(choose_qst_variations)
-            button_list = [{"title": question_names[i], "payload": f'/inform_module{{"question_id":"{str(question_ids[i])}"}}' } for i in range(len(question_ids))]
+            button_list = [{"title": question_names[i], "payload": f'/inform_question{{"question_id":"{str(question_ids[i])}"}}' } for i in range(len(question_ids))]
             dispatcher.utter_message(text= choose_qst_variations[0],buttons=button_list)
         return[]  
     
@@ -174,8 +177,9 @@ class ActionGetQuestionId(Action):
     # Assuming you have only one entity in the latest message
             entity_name = latest_entities[0].get("entity")
             entity_value = latest_entities[0].get("value")
-        # Your action logic here
-        return [SlotSet(entity_name, entity_value)]
+            return [SlotSet(entity_name, entity_value)]
+        else:
+            return []
     
 class ActionGet_Response(Action):
     def name(self):

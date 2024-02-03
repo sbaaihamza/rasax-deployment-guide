@@ -25,7 +25,7 @@ stories:
 - story: get questions
   steps:
     - action: action_get_situations
-    - intent: inform_module
+    - intent: inform_situation
       entities:
         - entity: "situation_id"
     - action: action_get_situation_id
@@ -33,7 +33,7 @@ stories:
 - story: get response
   steps:
     - action: action_get_questions
-    - intent: inform_module
+    - intent: inform_question
       entities:
         - entity: "question_id"
     - action: action_get_question_id
