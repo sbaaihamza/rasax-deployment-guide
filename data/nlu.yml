@@ -65,8 +65,15 @@ nlu:
     - من أنت؟
     - هل أنت بشري؟
     - من معي؟
-- intent: inform_module 
+- intent: inform_module
   examples: |
+    - I want to know about module [1](module_id)
+    - Can you tell me about module number [2](module_id)?
+    - What is module [3](module_id)?
+    - Show me details for module [4](module_id)
+    - I have a question about [95](module_id)
+    - Give me information on [100](module_id)
+    - Let's discuss module [82](module_id)
     - [1](module_id)
     - [2](module_id)
     - [3](module_id)
