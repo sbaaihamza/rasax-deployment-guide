@@ -20,7 +20,7 @@ from functions import *
 
 
 # load static data from file
-definitions_dict, module_titles,choose_qst_variations,definitions_dict_old,other_qst_variations= load_data_from_file('my data/static_data.json')
+definitions_dict, module_titles,choose_qst_variations,definitions_dict_old,other_qst_variations= load_data_from_file('/app/actions/mydata/static_data.json')
 
 class ActionStopNavigation(Action):
     def name(self) -> str:
