@@ -5,7 +5,6 @@
 # https://rasa.com/docs/rasa/custom-actions
  
 from typing import Any, Text, Dict, List
- 
 from rasa_sdk import Action, Tracker
 from rasa_sdk.executor import CollectingDispatcher
 from rasa_sdk.events import SlotSet
@@ -17,7 +16,6 @@ from datetime import datetime
 import pandas as pd
 import json
 from actions.functions import *
-
 
 # load static data from file
 definitions_dict, module_titles,choose_qst_variations,definitions_dict_old,other_qst_variations= load_data_from_file('/app/actions/mydata/static_data.json')
