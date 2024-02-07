@@ -16,7 +16,7 @@ import random
 from datetime import datetime
 import pandas as pd
 import json
-from functions import *
+from actions.functions import *
 
 
 # load static data from file
