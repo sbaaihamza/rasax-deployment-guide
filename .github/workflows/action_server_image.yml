@@ -16,7 +16,7 @@ jobs:
 
     - id: action_server
       name: Build an action server with a custom actions
-      uses: RasaHQ/action-server-gha@main
+      uses: baaihamza/rasax-deployment-guide@chatbot-optimization
       # Full list of parameters: https://github.com/RasaHQ/action-server-gha/tree/master#input-arguments
       with:
         docker_image_name: 'ayoubberd/example-action-server'
