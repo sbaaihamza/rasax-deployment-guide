@@ -13,7 +13,6 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
-
     - id: action_server
       name: Build an action server with a custom actions
       uses: RasaHQ/action-server-gha@main #sbaaihamza/rasax-deployment-guide@chatbot-optimization
