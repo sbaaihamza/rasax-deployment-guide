@@ -14,7 +14,7 @@ import random
 from datetime import datetime
 import pandas as pd
 import json
-from actions.functions import *
+from functions import *
 
 # load static data from file
 js_pth='/app/actions/mydata/static_data.json'
