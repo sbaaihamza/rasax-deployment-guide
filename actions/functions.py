@@ -6,8 +6,7 @@ import numpy as np
 import pandas as pd
 print("############################# IMPORTING UTILS")
 BERTmodel_names=['paraphrase-multilingual-MiniLM-L12-v2','medmediani/Arabic-KW-Mdel','Ezzaldin-97/STS-Arabert','distiluse-base-multilingual-cased-v1','sentence-transformers/LaBSE']
-# data_path="my data/BASE8RGPH24V1_all_12_12_ID"
-# data_path="my data/BASE8RGPH24V4_all_18_12_ID"
+
 data_path="/app/actions/mydata/Base_RGPH24V6_all_ID"
 print('################################## actions run using', data_path )
 
