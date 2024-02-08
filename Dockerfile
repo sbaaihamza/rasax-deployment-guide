@@ -33,6 +33,8 @@ RUN pip install -r requirements.txt
 COPY ./actions /app/actions
 COPY ./mydata /app/mydata
 COPY ./functions.py /app/functions.py
+RUN chmod -R 777 /app/actions
+RUN chmod -R 777 /app/actions/mydata
 RUN chmod -R 777 /app/mydata
 
 # By best practices, don't run the code with root user
