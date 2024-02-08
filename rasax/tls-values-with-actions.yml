@@ -2,66 +2,75 @@
 debugMode: true
 nginx:
 #  enabled: true
-# subPath: "/rasax"
-#customConfConfigMap: "custom-nginx-conf"
-#certificateSecret: "rasa-webservice-ingress-tls"    
-service:
-  enabled: true
-  # connect LoadBalancer directly to VMs' internal IP
-  # You get this value with: $ hostname -I
-  externalIPs: [134.209.251.136]
+ # subPath: "/rasax"
+  #customConfConfigMap: "custom-nginx-conf"
+  #certificateSecret: "rasa-webservice-ingress-tls"    
+  service:
+    enabled: true
+    # connect LoadBalancer directly to VMs' internal IP
+    # You get this value with: $ hostname -I
+    externalIPs: [134.209.251.136]
 
 rasax:
-  # initialUser is the user which is created upon the initial start of Rasa X
-  initialUser:
-      # password for the Rasa X user
-      password: "aSecureRandomString"
-  # passwordSalt Rasa X uses to salt the user passwords
-  passwordSalt: "AnotherSecureRandomString"
-  # token Rasa X accepts as authentication token from other Rasa services
-  token: "AnotherSecureRandomString"
-  # jwtSecret which is used to sign the jwtTokens of the users
-  jwtSecret: "AnotherSecureRandomString"
-  # tag refers to the Rasa X image tag
-  tag: "1.1.4"
- # extraEnvs:
-  #  - name: ROOT_URL
-      #value: "localhost/rasa-x"
- #     value: "http://10.30.27.11:4000/rasax"
+    # initialUser is the user which is created upon the initial start of Rasa X
+    initialUser:
+        # password for the Rasa X user
+        password: "aSecureRandomString"
+    # passwordSalt Rasa X uses to salt the user passwords
+    passwordSalt: "AnotherSecureRandomString"
+    # token Rasa X accepts as authentication token from other Rasa services
+    token: "AnotherSecureRandomString"
+    # jwtSecret which is used to sign the jwtTokens of the users
+    jwtSecret: "AnotherSecureRandomString"
+    # tag refers to the Rasa X image tag
+    tag: "1.1.4"
+   # extraEnvs:
+    #  - name: ROOT_URL
+        #value: "localhost/rasa-x"
+   #     value: "http://10.30.27.11:4000/rasa
 rasa:
-  # token Rasa accepts as authentication token from other Rasa services
-  token: "AnotherSecureRandomString"
-  # tag refers to the Rasa image tag
-  tag: "3.6.14"
-  additionalChannelCredentials:
-      rest:
-      socketio:
-          user_message_evt: user_uttered
-          bot_message_evt: bot_uttered
-          session_persistence: true/false
-  versions:
-      rasaProduction:
-          enabled: true
-          #replicaCount: 2
-      rasaWorker:
-          enabled: true
+    # token Rasa accepts as authentication token from other Rasa services
+    token: "AnotherSecureRandomString"
+    # tag refers to the Rasa image tag
+    tag: "3.6.16-full"
+    additionalChannelCredentials:
+        rest:
+        socketio:
+            user_message_evt: user_uttered
+            bot_message_evt: bot_uttered
+            session_persistence: true/false
+    versions:
+        rasaProduction:
+            enabled: true
+            replicaCount: 2
+            securityContext:
+              runAsUser: 0
+      # Assuming the use of a custom command or overriding the existing one
+            command: ["/bin/sh", "-c"]
+            args: ["pip install transformers"]
+        rasaWorker:
+            enabled: true
+      # Assuming the use of a custom command or overriding the existing one
+            command: ["/bin/sh", "-c"]
+            args: ["pip install transformers"]
 rabbitmq:
-  # rabbitmq settings of the subchart
-  rabbitmq:
-      # password which is used for the authentication
-      password: "AnotherSecureRandomString"
-  auth:
-      erlangCookie: "AnotherSecureRandomString"
+    # rabbitmq settings of the subchart
+    rabbitmq:
+        # password which is used for the authentication
+        password: "AnotherSecureRandomString"
+    auth:
+        erlangCookie: "AnotherSecureRandomString"
 global:
-  # postgresql: global settings of the postgresql subchart
-  postgresql:
-      # postgresqlPassword is the password which is used when the postgresqlUsername equals "postgres"
-      postgresqlPassword: "AnotherSecureRandomString"
-  # redis: global settings of the postgresql subchart
-  redis:
-      # password to use in case there no external secret was provided
-      password: "AnotherSecureRandomString"
+    # postgresql: global settings of the postgresql subchart
+    postgresql:
+        # postgresqlPassword is the password which is used when the postgresqlUsername equals "postgres"
+        postgresqlPassword: "AnotherSecureRandomString"
+    # redis: global settings of the postgresql subchart
+    redis:
+        # password to use in case there no external secret was provided
+        password: "AnotherSecureRandomString"
 app:
-install: true
-name: "19952707/optimize-action-server-2"
-tag: "latest"
+  install: true
+  name:  "ayoubberd/example-action-server" #"19952707/optimize-action-server-2"
+  tag: "2041130355b960e3f6b81680083f171def258445" #"latest"
+  replicaCount: 1
