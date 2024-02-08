@@ -15,12 +15,15 @@ jobs:
       uses: actions/checkout@v2
     - id: action_server
       name: Build an action server with a custom actions
-      uses: RasaHQ/action-server-gha@main #sbaaihamza/rasax-deployment-guide@chatbot-optimization
+      uses: sbaaihamza/rasax-deployment-guide@chatbot-optimization
+      #RasaHQ/action-server-gha@main
       # Full list of parameters: https://github.com/RasaHQ/action-server-gha/tree/master#input-arguments
       with:
         docker_image_name: 'ayoubberd/example-action-server'
         docker_registry_login: ${{ secrets.DOCKER_HUB_LOGIN }}
         docker_registry_password: ${{ secrets.DOCKER_HUB_PASSWORD }}
+        dockerfile: './Dockerfile'
+        actions_directory: './actions'
         # More details about github context:
         # https://docs.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions#github-context
         #
