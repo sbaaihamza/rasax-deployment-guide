@@ -1,5 +1,5 @@
 # Extend the official Rasa SDK image
-FROM rasa/rasa-sdk:3.1.3
+FROM rasa/rasa-sdk:3.6.2
 
 # Use subdirectory as working directory
 WORKDIR /app
@@ -12,10 +12,6 @@ ENV HF_HOME=/app/huggingface_cache
 RUN chown -R 1001 /app/huggingface_cache
 RUN chmod -R 777 /app/huggingface_cache
 
-
-RUN mkdir -p /app/records
-RUN chown -R 1001 /app/records
-RUN chmod -R 777 /app/records
 
 # Change back to root user to install dependencies
 USER root
@@ -36,6 +32,7 @@ RUN pip install -r requirements.txt
 # Copy actions folder to working directory
 COPY ./actions /app/actions
 COPY ./mydata /app/mydata
+COPY ./functions.py /app/functions.py
 RUN chmod -R 777 /app/mydata
 
 # By best practices, don't run the code with root user
