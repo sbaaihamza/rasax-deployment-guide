@@ -1,32 +1,30 @@
 on:
   push:
     branches:
-    # Make sure to update to your correct branch
       - chatbot_optimization
     paths:
-    - 'actions/**'
+      - 'actions/**'
 
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
     name: Build Action Server image and upgrade Rasa X deployment
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
-    - id: action_server
-      name: Build an action server with a custom actions
-      uses: sbaaihamza/rasax-deployment-guide@chatbot_optimization
-      #RasaHQ/action-server-gha@main
-      # Full list of parameters: https://github.com/RasaHQ/action-server-gha/tree/master#input-arguments
-      with:
-        docker_image_name: 'ayoubberd/example-action-server'
-        docker_registry_login: ${{ secrets.DOCKER_HUB_LOGIN }}
-        docker_registry_password: ${{ secrets.DOCKER_HUB_PASSWORD }}
-        dockerfile: './Dockerfile'
-        actions_directory: './actions'
-        # More details about github context:
-        # https://docs.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions#github-context
-        #
-        # github.sha - The commit SHA that triggered the workflow run
-        docker_image_tag: ${{ github.sha }}
-        requirements_file: 'actions/requirements.txt'
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_HUB_LOGIN }}
+          password: ${{ secrets.DOCKER_HUB_PASSWORD }}
+
+      - name: Build and push Docker image
+        run: |
+          docker build -t ${{ secrets.DOCKER_HUB_LOGIN }}/example-action-server:${{ github.sha }} -f ./Dockerfile .
+          docker push ${{ secrets.DOCKER_HUB_LOGIN }}/example-action-server:${{ github.sha }}
+
+      # Add any additional steps here if you need to deploy or do anything else with the built image
