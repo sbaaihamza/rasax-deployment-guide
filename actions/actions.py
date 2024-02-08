@@ -17,7 +17,6 @@ import pandas as pd
 import json
 from actions.functions import *
 
-
 # load static data from file
 js_pth='/app/actions/mydata/static_data.json'
 definitions_dict, module_titles,choose_qst_variations,definitions_dict_old,other_qst_variations= load_data_from_file(js_pth)
