@@ -40,7 +40,6 @@ pipeline:
       # use lookup tables to extract entities
       # use_lookup_tables: True
       # use regexes to extract entities
-     use_regexes: True
       # use match word boundaries for lookup table
       # use_word_boundaries: True
    - name: DIETClassifier
