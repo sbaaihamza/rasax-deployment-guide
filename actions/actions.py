@@ -18,7 +18,9 @@ import json
 from functions import *
 
 # load static data from file
+# js_pth='mydata/static_data.json'
 js_pth='/app/actions/mydata/static_data.json'
+
 definitions_dict, module_titles,choose_qst_variations,definitions_dict_old,other_qst_variations= load_data_from_file(js_pth)
 
 class ActionStopNavigation(Action):
@@ -49,7 +51,9 @@ class ActionGetUserQuestion(Action):
             return [SlotSet("user_question", user_message_all)]
         # Generate and send module buttons
         module_ids, module_names = module_recommendations(df_recommendations, n=n_module)
+        print(module_ids,module_names)
         button_list = [{"title": name, "payload": f'/inform_module{{"module_id":"{str(module_id)}"}}'} for module_id, name in zip(module_ids, module_names)]
+        print("button_list",button_list)
         dispatcher.utter_message(text="اختر الوحدة المتعلقة بسؤالك", buttons=button_list)
         # Set the user_question value in a slot for future use
         return [SlotSet("user_question", user_message_all) , SlotSet("my_dataframe_slot", dataframe_json)]   
@@ -103,17 +107,24 @@ class ActionGet_Situations(Action):
         return "action_get_situations"
 
     def run(self, dispatcher, tracker, domain):
-        # Access the ID from the slot
-        module_number = tracker.get_slot('module_id')
         try:
             my_dataframe_slot = tracker.get_slot('my_dataframe_slot')
             df_rslt = pd.read_json(my_dataframe_slot, orient='split')
 
         except Exception as e:
             print(e)
-            dispatcher.utter_message(" !! خلل في تحميل البيانات")#TODO: translate
+            dispatcher.utter_message(" !! خلل في تحميل البيانات")
             return []
-        situation_ids,situation_names=situation_recommendations(df_rslt,int(module_number),n=n_situation)
+        try:
+            module_number = tracker.get_slot('module_id')
+            print("module_number",module_number)
+            situation_ids,situation_names=situation_recommendations(df_rslt,int(module_number),n=n_situation)
+
+        except Exception as e:
+            print(e)
+            dispatcher.utter_message("!! الرجاء المحاولة مرة أخرى") 
+            return []                        
+
         if situation_ids==[]:
                         dispatcher.utter_message("لا يوجد السياق متاح في هذه الوحدة")
         else:
@@ -146,7 +157,7 @@ class ActionGet_Questions(Action):
 
     def run(self, dispatcher, tracker, domain):
         # Access the ID from the slot
-        situation_number = tracker.get_slot('situation_id')
+
         try:
             my_dataframe_slot = tracker.get_slot('my_dataframe_slot')
             df_rslt = pd.read_json(my_dataframe_slot, orient='split')
@@ -154,7 +165,15 @@ class ActionGet_Questions(Action):
             print(e)
             dispatcher.utter_message(" !! خلل في تحميل البيانات")
             return []
-        question_ids,question_names,reste,reste_question=question_recommendations(df_rslt,int(situation_number),n=n_question)
+        try:
+            situation_number = tracker.get_slot('situation_id')
+            print("situation_number",situation_number)
+            question_ids,question_names,reste,reste_question=question_recommendations(df_rslt,int(situation_number),n=n_question)
+
+        except Exception as e:
+            print(e)
+            dispatcher.utter_message(" !! الرجاء المحاولة مرة أخرة ")
+            return []
         if question_ids==[]:
                         dispatcher.utter_message("لا يوجد سؤال متاح في هذا السياق")
         else:
@@ -186,8 +205,15 @@ class ActionGet_Response(Action):
 
     def run(self, dispatcher, tracker, domain):
         # Access the ID from the slot
-        question_number = tracker.get_slot('question_id')
-        response=get_responses(int(question_number))
+        try:
+            question_number = tracker.get_slot('question_id')
+            print("question_number",question_number)
+            response=get_responses(int(question_number))
+
+        except Exception as e:
+            print(e)
+            dispatcher.utter_message("!! الرجاء المحاولة مرة أخرى") 
+            return []          
         # Use the ID in your action logic
         dispatcher.utter_message(text=f" {response[0]}")
 

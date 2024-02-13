@@ -6,9 +6,10 @@ import numpy as np
 import pandas as pd
 print("############################# IMPORTING UTILS")
 BERTmodel_names=['paraphrase-multilingual-MiniLM-L12-v2','medmediani/Arabic-KW-Mdel','Ezzaldin-97/STS-Arabert','distiluse-base-multilingual-cased-v1','sentence-transformers/LaBSE']
-# data_path="my data/BASE8RGPH24V1_all_12_12_ID"
-# data_path="my data/BASE8RGPH24V4_all_18_12_ID"
-data_path="/app/actions/mydata/Base_RGPH24V6_all_ID"
+
+# data_path="mydata/Base_RGPH24V6+_all_ID"
+data_path="/app/actions/mydata/Base_RGPH24V6+_all_ID"
+
 print('################################## actions run using', data_path )
 
 df=pd.read_excel(data_path +'.xlsx')
@@ -163,15 +164,19 @@ def add_resp_ids(df, df_rslt):
 #     df_rslt['ralated_responses'] = df_rslt.apply(get_related_responses, axis=1)
 #     return df_rslt
 
-
+def module_recommendations(df_rslt,n=n_module):
+    module_ids = df_rslt['module_ID'].unique()[:n].tolist()
+    module_names=[df[df.Module_ID==module_id].module.unique().tolist()[0] for module_id in module_ids]
+    df[df.Module_ID.isin(module_ids)].module.unique().tolist()
+    return module_ids,module_names
 
 ##new
-def module_recommendations(df_rslt, n=n_module):
-    # Get the first n unique module IDs
-    module_ids = df_rslt['module_ID'].dropna().unique()[:n]
-    # Retrieve module names for these IDs
-    module_names = df[df.Module_ID.isin(module_ids)]['module'].drop_duplicates().tolist()
-    return module_ids.tolist(), module_names
+# def module_recommendations(df_rslt, n=n_module):
+#     # Get the first n unique module IDs
+#     module_ids = df_rslt['module_ID'].dropna().unique()[:n]
+#     # Retrieve module names for these IDs
+#     module_names = df[df.Module_ID.isin(module_ids)]['module'].drop_duplicates().tolist()
+#     return module_ids.tolist(), module_names
 
 
 ##new
@@ -189,7 +194,7 @@ def situation_recommendations(df_rslt, module_id, n=n_situation, nan_id=5):
 def question_recommendations(df_rslt_with_qst, situation_ID, n=n_question):
     # Check the first row's conditions
     first_row = df_rslt_with_qst.iloc[0]
-    if first_row['category'] == "question" and first_row['similarity'] > 0.8:
+    if first_row['category'] == "question" and first_row['similarity'] > 0.98:
         questions = [first_row['ralated_responses']]
     else:
         questions = []
@@ -212,9 +217,12 @@ def question_recommendations(df_rslt_with_qst, situation_ID, n=n_question):
             extra_questions.append(question_id)
             extra_question_names.append(question_to_name.get(question_id))
     return selected_questions, question_names, extra_questions, extra_question_names
-
-##new
+#old
 def get_responses(question_id):
-    # Use loc for efficient row selection and drop_duplicates for unique responses
-    response = df.loc[df.Question_ID == question_id, 'Réponse  Quasi-finale'].drop_duplicates().tolist()
-    return response
+    response=df[df.Question_ID==question_id]['Réponse  Quasi-finale'].unique().tolist()
+    return(response)
+# ##new
+# def get_responses(question_id):
+#     # Use loc for efficient row selection and drop_duplicates for unique responses
+#     response = df.loc[df.Question_ID == question_id, 'Réponse  Quasi-finale'].drop_duplicates().tolist()
+#     return response

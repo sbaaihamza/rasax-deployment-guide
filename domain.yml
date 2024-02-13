@@ -1,7 +1,5 @@
 version: "3.0"
-
 intents:
-
   - greet
   - goodbye
   - deny
@@ -15,8 +13,6 @@ intents:
   - inform_question
   - rechoisir_module
   - paylod_definitions
-
-
 actions:
     - action_stop_navigation
     - action_get_user_question
@@ -37,36 +33,39 @@ entities:
 slots:
   my_dataframe_slot:
     type: any
+    influence_conversation: false
     mappings:
         - type: custom
-          # action: action_get_user_question
 
   user_question:
     type: text
-
+    influence_conversation: false
     mappings:
     - type: custom
-      # action: action_get_user_question
 
   module_id:
     type: text
+    influence_conversation: false
     mappings:
     - type: from_entity
       entity: module_id
+      intent: inform_module
 
   situation_id:
     type: text
+    influence_conversation: false
     mappings:
     - type: from_entity
       entity: situation_id
-
+      intent: inform_situation
 
   question_id:
     type: text
+    influence_conversation: false
     mappings:
     - type: from_entity
       entity: question_id
-
+      intent: inform_question
 responses:
 
   utter_hello:
