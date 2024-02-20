@@ -1,5 +1,7 @@
-version: "3.0"
+version: "3.1"
+
 intents:
+
   - greet
   - goodbye
   - deny
@@ -13,6 +15,8 @@ intents:
   - inform_question
   - rechoisir_module
   - paylod_definitions
+
+
 actions:
     - action_stop_navigation
     - action_get_user_question

@@ -1,13 +1,11 @@
 import pickle
 import json, os, math
-from sentence_transformers import SentenceTransformer
 from sentence_transformers.util import pytorch_cos_sim 
 import numpy as np
 import pandas as pd
 print("############################# IMPORTING UTILS")
-BERTmodel_names=['paraphrase-multilingual-MiniLM-L12-v2','medmediani/Arabic-KW-Mdel','Ezzaldin-97/STS-Arabert','distiluse-base-multilingual-cased-v1','sentence-transformers/LaBSE']
 
-# data_path="mydata/Base_RGPH24V6+_all_ID"
+# data_path="mydata/Base_RGPH24V7_all_ID"
 data_path="/app/actions/mydata/Base_RGPH24V6+_all_ID"
 
 print('################################## actions run using', data_path )
@@ -38,14 +36,8 @@ else:
     with open(dict_path, 'w', encoding='utf-8') as file:
         json.dump(unique_values_dict, file, ensure_ascii=False, indent=2)
 
-
-BERTmodel_name=BERTmodel_names[0]
-situations_list = list(unique_values_dict.keys())
-# BERTmodel_name=BERTmodel_names[-1]
-BERT_model=SentenceTransformer(BERTmodel_name )
-pkl_path=data_path+BERTmodel_name.split('/')[0]+'situations_embeddings.pkl'
-
-print('################# using MODEL:', BERTmodel_name)
+pkl_path=data_path+'rasa_situations_embeddings.pkl'
+print('################# using embeddings MODEL:', pkl_path)
 ### initialize weights
 
 ##new
@@ -54,17 +46,15 @@ if os.path.exists(pkl_path):
     # Load sentences & embeddings from disk
     with open(pkl_path, "rb") as fIn:
         stored_data = pickle.load(fIn)
-        situations = stored_data['situations']
+        situations_list = list(stored_data['situations'] .keys())       
         BERT_weights = stored_data['BERT_weights']
-    print("BERT model found")
+        corpus_size=len(BERT_weights)
+        BERT_weights = BERT_weights.reshape((corpus_size, 768))
+
+    print("Embeddings found")
 else:
-    # Encode using BERT model and save to disk
-    BERT_weights = BERT_model.encode(situations_list, convert_to_tensor=True, show_progress_bar=False)
-    print("BERT model fine-tuned")
-    with open(pkl_path, "wb") as fOut:
-        pickle.dump({'situations': unique_values_dict, 'BERT_weights': BERT_weights}, 
-                     fOut, protocol=pickle.HIGHEST_PROTOCOL)
-    print("BERT model saved")
+    print("Embeddings not found")
+
 print("#################################First load script ended #####################")
 
 # Function to load data from the file
@@ -74,8 +64,7 @@ def load_data_from_file(file_path):
     return data['definitions_dict'], data['module_titles'],data['choose_qst_variations'],data['definitions_dict_old'],data["other_qst_variations"]
 
 ## new
-def provide_recommendations(user_input,THRESH, n, unique_values_dict,BERT_weights,n_module=n_module):
-    input_weight=BERT_model.encode(user_input, show_progress_bar = True,convert_to_tensor=True)
+def provide_recommendations(user_input,input_weight,THRESH, n, unique_values_dict,BERT_weights,n_module=n_module):
     cosine_scores = pytorch_cos_sim(input_weight, BERT_weights)
     cosine_scores = cosine_scores.cpu().numpy()
     # Assuming cosine_scores is a 2D numpy array
@@ -103,9 +92,7 @@ def provide_recommendations(user_input,THRESH, n, unique_values_dict,BERT_weight
     df_rec=df_rec[df_rec.module_ID.isin(module_ids)]
     df_resp=add_resp_ids(df,df_rec)
     df_with_qst=add_qst_ids(df,df_resp)
-    # df_with_qst.to_excel(path,index=False)
-    # pd.DataFrame(ordred_situations_IDs[:n]).to_excel(path,index=False)##TODO : change to json , and try to use trackers 
-    # return(pd.DataFrame(ordred_situations_IDs[:n]))
+    # df_with_qst.to_excel('records/rslt'+user_input+".xlsx",index=False)
     return(df_with_qst)
 
 ##new 
@@ -139,30 +126,6 @@ def add_resp_ids(df, df_rslt):
     df_rslt['ralated_responses']=ids
     return df_rslt
 
-##new !!!!!!!!!!!!! not working
-# def add_resp_ids(df, df_rslt):
-#     # Pre-filter DataFrames or Series for each category
-#     question_ids = df.set_index('Question_ID')['response_ID']
-#     tags_ids = df.set_index('Tags_ID')['response_ID']
-#     tags_sit_ids = df.set_index('tags_sit_ID')['response_ID']
-#     situation_ids = df.set_index('Situation_ID')['response_ID']
-#     # section_ids = df.set_index('Section_ID')['response_ID']
-#     # Function to get related response IDs based on category
-#     def get_related_responses(row):
-#         if row['category'] == 'question':
-#             return question_ids.get(row["element_ID"], []).unique()
-#         if row['category'] == 'tags':
-#             return tags_ids.get(row["element_ID"], []).unique()
-#         if row['category'] == 'situation Tags':
-#             return tags_sit_ids.get(row["element_ID"], []).unique()
-#         if row['category'] == 'situation':
-#             return situation_ids.get(row["element_ID"], []).unique()
-#         # if row['category'] == 'section':
-#             # return section_ids.get(row["element_ID"], []).unique()
-#         return []
-#     # Apply the function to each row of df_rslt
-#     df_rslt['ralated_responses'] = df_rslt.apply(get_related_responses, axis=1)
-#     return df_rslt
 
 def module_recommendations(df_rslt,n=n_module):
     module_ids = df_rslt['module_ID'].unique()[:n].tolist()
@@ -170,17 +133,9 @@ def module_recommendations(df_rslt,n=n_module):
     df[df.Module_ID.isin(module_ids)].module.unique().tolist()
     return module_ids,module_names
 
-##new
-# def module_recommendations(df_rslt, n=n_module):
-#     # Get the first n unique module IDs
-#     module_ids = df_rslt['module_ID'].dropna().unique()[:n]
-#     # Retrieve module names for these IDs
-#     module_names = df[df.Module_ID.isin(module_ids)]['module'].drop_duplicates().tolist()
-#     return module_ids.tolist(), module_names
-
 
 ##new
-def situation_recommendations(df_rslt, module_id, n=n_situation, nan_id=5):
+def situation_recommendations(df_rslt, module_id, n=n_situation, nan_id=4):
     # Filter the DataFrame and get unique situation IDs, excluding nan_id
     filtered_situation_ids = df_rslt[(df_rslt['module_ID'] == int(module_id)) & (df_rslt['situation_ID'] != nan_id)]['situation_ID'].unique()
     # Limit the number of situation IDs to n
@@ -221,8 +176,4 @@ def question_recommendations(df_rslt_with_qst, situation_ID, n=n_question):
 def get_responses(question_id):
     response=df[df.Question_ID==question_id]['Réponse  Quasi-finale'].unique().tolist()
     return(response)
-# ##new
-# def get_responses(question_id):
-#     # Use loc for efficient row selection and drop_duplicates for unique responses
-#     response = df.loc[df.Question_ID == question_id, 'Réponse  Quasi-finale'].drop_duplicates().tolist()
-#     return response
+

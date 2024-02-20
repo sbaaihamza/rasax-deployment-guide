@@ -37,9 +37,11 @@ class ActionGetUserQuestion(Action):
     ##new
     def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain) -> list:
         user_message_all = tracker.latest_message.get('text')
+        input_weight=tracker.latest_message.get('embedding')
+        # print("######tracker.latest_message",input_weight)
         # Generate recommendations
         try:
-            df_recommendations = provide_recommendations(user_message_all, THRESH=0.3, n=1000, unique_values_dict=unique_values_dict, BERT_weights=BERT_weights,n_module=n_module)
+            df_recommendations = provide_recommendations(user_message_all, input_weight,THRESH=0.3, n=1000, unique_values_dict=unique_values_dict, BERT_weights=BERT_weights,n_module=n_module)
             dataframe_json = df_recommendations.to_json(orient='split')
         except Exception as e:
             print(e)
@@ -51,13 +53,11 @@ class ActionGetUserQuestion(Action):
             return [SlotSet("user_question", user_message_all)]
         # Generate and send module buttons
         module_ids, module_names = module_recommendations(df_recommendations, n=n_module)
-        print(module_ids,module_names)
         button_list = [{"title": name, "payload": f'/inform_module{{"module_id":"{str(module_id)}"}}'} for module_id, name in zip(module_ids, module_names)]
-        print("button_list",button_list)
         dispatcher.utter_message(text="اختر الوحدة المتعلقة بسؤالك", buttons=button_list)
+
         # Set the user_question value in a slot for future use
         return [SlotSet("user_question", user_message_all) , SlotSet("my_dataframe_slot", dataframe_json)]   
-
 
 class ActionReselectModule(Action):
     def name(self) -> str:
@@ -110,29 +110,28 @@ class ActionGet_Situations(Action):
         try:
             my_dataframe_slot = tracker.get_slot('my_dataframe_slot')
             df_rslt = pd.read_json(my_dataframe_slot, orient='split')
+            try:
+                module_number = tracker.get_slot('module_id')
+                situation_ids,situation_names=situation_recommendations(df_rslt,int(module_number),n=n_situation)
+                if situation_ids==[]:
+                                dispatcher.utter_message("لا يوجد السياق متاح في هذه الوحدة")
+                else:
 
+                    button_list = [{"title": situation_names[i], "payload": f'/inform_situation{{"situation_id":"{str(situation_ids[i])}"}}'  } for i in range(len(situation_ids))]
+                    button_list.append({"title": "انقر هنا لإعادة إختيار الوحدة", "payload": '/rechoisir_module'})
+                    dispatcher.utter_message(text= "اختر السياق الأقرب إلى سؤالك",buttons=button_list)
+                return []
+            except Exception as e:
+                print(e)
+                dispatcher.utter_message("!! الرجاء المحاولة مرة أخرى") 
+                return [] 
         except Exception as e:
             print(e)
             dispatcher.utter_message(" !! خلل في تحميل البيانات")
             return []
-        try:
-            module_number = tracker.get_slot('module_id')
-            print("module_number",module_number)
-            situation_ids,situation_names=situation_recommendations(df_rslt,int(module_number),n=n_situation)
+                       
 
-        except Exception as e:
-            print(e)
-            dispatcher.utter_message("!! الرجاء المحاولة مرة أخرى") 
-            return []                        
 
-        if situation_ids==[]:
-                        dispatcher.utter_message("لا يوجد السياق متاح في هذه الوحدة")
-        else:
-
-            button_list = [{"title": situation_names[i], "payload": f'/inform_situation{{"situation_id":"{str(situation_ids[i])}"}}'  } for i in range(len(situation_ids))]
-            button_list.append({"title": "انقر هنا لإعادة إختيار الوحدة", "payload": '/rechoisir_module'})
-            dispatcher.utter_message(text= "اختر السياق الأقرب إلى سؤالك",buttons=button_list)
-        return []
 
 class ActionGetsituationId(Action):
     def name(self):
@@ -167,7 +166,6 @@ class ActionGet_Questions(Action):
             return []
         try:
             situation_number = tracker.get_slot('situation_id')
-            print("situation_number",situation_number)
             question_ids,question_names,reste,reste_question=question_recommendations(df_rslt,int(situation_number),n=n_question)
 
         except Exception as e:
@@ -207,7 +205,6 @@ class ActionGet_Response(Action):
         # Access the ID from the slot
         try:
             question_number = tracker.get_slot('question_id')
-            print("question_number",question_number)
             response=get_responses(int(question_number))
 
         except Exception as e:
