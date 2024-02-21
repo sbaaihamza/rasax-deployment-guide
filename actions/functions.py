@@ -6,7 +6,7 @@ import pandas as pd
 print("############################# IMPORTING UTILS")
 
 # data_path="mydata/Base_RGPH24V7_all_ID"
-data_path="/app/actions/mydata/Base_RGPH24V6+_all_ID"
+data_path="/app/actions/mydata/Base_RGPH24V7_all_ID"
 
 print('################################## actions run using', data_path )
 
