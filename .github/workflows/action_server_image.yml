@@ -24,7 +24,7 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-          docker build -t ${{ secrets.DOCKER_HUB_LOGIN }}/example-action-server:${{ github.sha }} -f ./Dockerfile .
-          docker push ${{ secrets.DOCKER_HUB_LOGIN }}/example-action-server:${{ github.sha }}
+          docker build -t ${{ secrets.DOCKER_HUB_LOGIN }}/example-action-server:latest -f ./Dockerfile .
+          docker push ${{ secrets.DOCKER_HUB_LOGIN }}/example-action-server:latest
 
       # Add any additional steps here if you need to deploy or do anything else with the built image
