@@ -1,27 +1,52 @@
 # Use the specific version of Rasa as the base image
-ARG RELEASE
-ARG LAUNCHPAD_BUILD_ARCH
-LABEL org.opencontainers.image.ref.name=ubuntu
-LABEL org.opencontainers.image.version=22.04
-ADD file:aa9b51e9f0067860cebbc9930374452d1384ec3c59badb5e4733130eedc90329 in / 
-CMD ["/bin/bash"]
+
+# Use the specific version of Rasa as the base image
+FROM rasa/rasa:3.6.16-full
+
+# Set noninteractive to avoid prompts during build
 ENV DEBIAN_FRONTEND=noninteractive
-RUN /bin/sh -c apt-get update
-RUN /bin/sh -c apt-get update
-RUN /bin/sh -c update-alternatives --install
-RUN /bin/sh -c useradd -rm
-COPY /opt/venv /opt/venv # buildkit
-ENV PATH=/opt/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-ENV HOME=/app
-WORKDIR /app
+
+# Copy your custom lm_featurizer.py into the container, replacing the existing one
 COPY ./core_changes/lm_featurizer.py /opt/venv/lib/python3.10/site-packages/rasa/nlu/featurizers/dense_featurizer/lm_featurizer.py
-RUN /bin/sh -c chgrp -R
-USER 1001
-VOLUME [/tmp]
-SHELL [/bin/bash -o pipefail -c]
-EXPOSE map[5005/tcp:{}]
+
+# Ensure permissions are correctly set
+RUN chown 1001:1001 /opt/venv/lib/python3.10/site-packages/rasa/nlu/featurizers/dense_featurizer/lm_featurizer.py
+
+# Set the working directory
+WORKDIR /app
+
+# Expose the port the app runs on
+EXPOSE 5005
+
+# Use the same entrypoint as the base image
 ENTRYPOINT ["rasa"]
+
+# By default, show help (consider changing this to run your app, e.g., CMD ["run"])
 CMD ["--help"]
+
+# ARG RELEASE
+# ARG LAUNCHPAD_BUILD_ARCH
+# LABEL org.opencontainers.image.ref.name=ubuntu
+# LABEL org.opencontainers.image.version=22.04
+# ADD file:aa9b51e9f0067860cebbc9930374452d1384ec3c59badb5e4733130eedc90329 in / 
+# CMD ["/bin/bash"]
+# ENV DEBIAN_FRONTEND=noninteractive
+# RUN /bin/sh -c apt-get update
+# RUN /bin/sh -c apt-get update
+# RUN /bin/sh -c update-alternatives --install
+# RUN /bin/sh -c useradd -rm
+# COPY /opt/venv /opt/venv # buildkit
+# ENV PATH=/opt/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+# ENV HOME=/app
+# WORKDIR /app
+# COPY ./core_changes/lm_featurizer.py /opt/venv/lib/python3.10/site-packages/rasa/nlu/featurizers/dense_featurizer/lm_featurizer.py
+# RUN /bin/sh -c chgrp -R
+# USER 1001
+# VOLUME [/tmp]
+# SHELL [/bin/bash -o pipefail -c]
+# EXPOSE map[5005/tcp:{}]
+# ENTRYPOINT ["rasa"]
+# CMD ["--help"]
 #FROM rasa/rasa:3.6.16-full
 
 # Copy the new lm_featurizer.py file into the container, replacing the existing one
