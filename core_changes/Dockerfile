@@ -1,16 +1,17 @@
 # Use the specific version of Rasa as the base image
-
-# Use the specific version of Rasa as the base image
 FROM rasa/rasa:3.6.16-full
 
-# Set noninteractive to avoid prompts during build
-ENV DEBIAN_FRONTEND=noninteractive
+# Temporarily switch to root to change file permissions
+USER root
 
 # Copy your custom lm_featurizer.py into the container, replacing the existing one
 COPY ./core_changes/lm_featurizer.py /opt/venv/lib/python3.10/site-packages/rasa/nlu/featurizers/dense_featurizer/lm_featurizer.py
 
 # Ensure permissions are correctly set
 RUN chown 1001:1001 /opt/venv/lib/python3.10/site-packages/rasa/nlu/featurizers/dense_featurizer/lm_featurizer.py
+
+# Switch back to the non-root user for Rasa to run
+USER 1001
 
 # Set the working directory
 WORKDIR /app
@@ -23,6 +24,7 @@ ENTRYPOINT ["rasa"]
 
 # By default, show help (consider changing this to run your app, e.g., CMD ["run"])
 CMD ["--help"]
+
 
 # ARG RELEASE
 # ARG LAUNCHPAD_BUILD_ARCH
