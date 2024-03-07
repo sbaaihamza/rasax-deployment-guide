@@ -10,6 +10,7 @@ from rasa_sdk.executor import CollectingDispatcher
 from rasa_sdk.events import SlotSet
 from rasa_sdk import FormValidationAction
 from rasa_sdk.types import DomainDict
+
 import random
 from datetime import datetime
 import pandas as pd
@@ -19,6 +20,7 @@ from functions import *
 # load static data from file
 # js_pth='mydata/static_data.json'
 js_pth='/app/actions/mydata/static_data.json'
+
 definitions_dict, module_titles,choose_qst_variations,definitions_dict_old,other_qst_variations= load_data_from_file(js_pth)
 
 class ActionStopNavigation(Action):

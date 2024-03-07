@@ -5,8 +5,9 @@ import numpy as np
 import pandas as pd
 print("############################# IMPORTING UTILS")
 
-# data_path="mydata/Base_RGPH24V7_all_ID"
-data_path="/app/actions/mydata/Base_RGPH24V7_all_ID"
+# data_path="mydata/Base_RGPH24V7+_all_ID"
+data_path="/app/actions/mydata/Base_RGPH24V7+_all_ID"
+
 print('################################## actions run using', data_path )
 
 df=pd.read_excel(data_path +'.xlsx')
@@ -134,7 +135,7 @@ def module_recommendations(df_rslt,n=n_module):
 
 
 ##new
-def situation_recommendations(df_rslt, module_id, n=n_situation, nan_id=4):
+def situation_recommendations(df_rslt, module_id, n=n_situation, nan_id=16):
     # Filter the DataFrame and get unique situation IDs, excluding nan_id
     filtered_situation_ids = df_rslt[(df_rslt['module_ID'] == int(module_id)) & (df_rslt['situation_ID'] != nan_id)]['situation_ID'].unique()
     # Limit the number of situation IDs to n
