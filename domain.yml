@@ -1,52 +1,38 @@
-version: "3.1"
-
+version: '3.0'
+session_config:
+  session_expiration_time: 60
+  carry_over_slots_to_new_session: true
 intents:
-
-  - greet
-  - goodbye
-  - deny
-  - bot_challenge
-  - Type
-  - thanks
-  - ask_navigate_data
-  - ask_definition
-  - inform_module
-  - inform_situation
-  - inform_question
-  - rechoisir_module
-  - paylod_definitions
-
-
-actions:
-    - action_stop_navigation
-    - action_get_user_question
-    - action_get_module_id
-    - action_get_situations
-    - action_get_questions
-    - action_get_situation_id
-    - action_get_question_id
-    - action_get_response
-    - action_reselect_module
-    - action_utter_module_buttons
-    - action_log_conversation
-    - action_get_module_definitions2
-entities: 
-  - module_id
-  - situation_id
-  - question_id
+- greet
+- goodbye
+- deny
+- bot_challenge
+- Type
+- thanks
+- ask_navigate_data
+- ask_definition
+- inform_module
+- inform_situation
+- inform_question
+- rechoisir_module
+- paylod_definitions
+- nlu_fallback
+entities:
+- module_id
+- situation_id
+- question_id
+- entity
 slots:
   my_dataframe_slot:
     type: any
     influence_conversation: false
     mappings:
-        - type: custom
-
+    - type: custom
   user_question:
     type: text
     influence_conversation: false
     mappings:
     - type: custom
-
   module_id:
     type: text
     influence_conversation: false
@@ -54,7 +40,6 @@ slots:
     - type: from_entity
       entity: module_id
       intent: inform_module
-
   situation_id:
     type: text
     influence_conversation: false
@@ -62,7 +47,6 @@ slots:
     - type: from_entity
       entity: situation_id
       intent: inform_situation
-
   question_id:
     type: text
     influence_conversation: false
@@ -71,73 +55,75 @@ slots:
       entity: question_id
       intent: inform_question
 responses:
-
   utter_hello:
-  - text: "!مرحبا  "
-
+  - text: '!مرحبا  '
   utter_please_rephrase:
-  - text:  عذرًا، لم أفهم تمامًا. هل يمكنك إعادة صياغتها؟
-  - text:  آسف، لم أتفهم ذلك تمامًا. هل يمكنك القول بطريقة أخرى؟
-  - text:  عفوًا، لم أستوعب ذلك جيدًا. هل يمكنك تعديل الصياغة؟
-  - text:  أعتذر، لم يكن واضحًا بالنسبة لي. هل تستطيع إعادة الصياغة؟
-  - text:  عذرًا، لم يكن واضحًا بالنسبة لي. هل يمكنك تقديمه بشكل مختلف؟
-  - text:  آسف، لم أستوعب ذلك. هل يمكنك أن تعيد صياغة السؤال؟
-  - text:  عفوًا، لم أكن واضحًا في فهم ذلك. هل يمكنك أن تعيد صياغته؟
-  - text:  أعتذر، لم يتضح ذلك لي. هل تستطيع أن تعيد صياغة الفكرة؟
-
+  - text: عذرًا، لم أفهم تمامًا. هل يمكنك إعادة صياغتها؟
+  - text: آسف، لم أتفهم ذلك تمامًا. هل يمكنك القول بطريقة أخرى؟
+  - text: عفوًا، لم أستوعب ذلك جيدًا. هل يمكنك تعديل الصياغة؟
+  - text: أعتذر، لم يكن واضحًا بالنسبة لي. هل تستطيع إعادة الصياغة؟
+  - text: عذرًا، لم يكن واضحًا بالنسبة لي. هل يمكنك تقديمه بشكل مختلف؟
+  - text: آسف، لم أستوعب ذلك. هل يمكنك أن تعيد صياغة السؤال؟
+  - text: عفوًا، لم أكن واضحًا في فهم ذلك. هل يمكنك أن تعيد صياغته؟
+  - text: أعتذر، لم يتضح ذلك لي. هل تستطيع أن تعيد صياغة الفكرة؟
   utter_default:
-  - text: آسف لم أفهم ذلك. هل يمكنك إعادة الصياغة؟؟
-
-  utter_menu_greet :
-    - text: 'كيف يمكنني مساعدتك اليوم؟'
-      buttons: 
-      - title: استعراض تعريف الوحدات
-        payload: '/ask_definition'
-      - title: أسئلة مباشرة أو كلمات رئيسية؟ 
-        payload: "/ask_navigate_data"
-
-  # utter_guidance:
-  #   - text: " للحصول على تعاريف الوحدات، اكتب  تعريف الوحدات  \ \n  للبحت عن سؤال معين،اكتب   تصفح البيانات "     
-
- 
+  - text: آسف لم أفهم ذلك. هل يمكنك إعادة الصياغة؟
+  utter_menu_greet:
+  - buttons:
+    - payload: /ask_definition
+      title: استعراض تعريف الوحدات
+    - payload: /ask_navigate_data
+      title: أسئلة مباشرة أو كلمات رئيسية؟
+    text: كيف يمكنني مساعدتك اليوم؟
   utter_menu:
-    - text: "اختر التجربة المناسبة" 
-      buttons: 
-      - title: استعراض تعريف الوحدات
-        payload: '/ask_definition'
-      - title: أسئلة مباشرة أو كلمات رئيسية؟ 
-        payload: "/ask_navigate_data"
-
+  - buttons:
+    - payload: /ask_definition
+      title: استعراض تعريف الوحدات
+    - payload: /ask_navigate_data
+      title: أسئلة مباشرة أو كلمات رئيسية؟
+    text: اختر التجربة المناسبة
   utter_menu_fallback:
-    - text: الرجاء تقديم سؤالك بدقة أو إستخدام كلمات مفتاحية لتحديد موضوع استفسارك. يمكنك كذلك الإستعانة بالقائمة الرئيسية 
-      buttons: 
-      - title: ولوج تعريف الوحدات
-        payload: '/ask_definition'
-      - title: أسئلة مباشرة أو كلمات رئيسية؟ 
-        payload: "/ask_navigate_data" 
+  - buttons:
+    - payload: /ask_definition
+      title: ولوج تعريف الوحدات
+    - payload: /ask_navigate_data
+      title: أسئلة مباشرة أو كلمات رئيسية؟
+    text: الرجاء تقديم سؤالك بدقة أو إستخدام كلمات مفتاحية لتحديد موضوع استفسارك. يمكنك كذلك الإستعانة بالقائمة الرئيسية
   utter_ask_me:
   - text: . يرجى طرح سؤالك
-  - text: .لو سمحت، قدم سؤال 
+  - text: .لو سمحت، قدم سؤال
   - text: . أطلب ما تريد
   - text: .فضلًا، قدم استفسارك
   - text: .إذا كان لديك سؤال، لا تتردد في طرحه
   - text: .أنا هنا للإجابة على أسئلتك، لذا لا تتردد في طرحها
   - text: .سأكون سعيدًا بالاستماع إلى سؤالك
   utter_thanks:
-  - text: 😊 كنت سعيدًا بالمساعدة 
-  - text: 😊 بكل سرور سأكون في خدمتك 
-  - text: 😊  تسرني مساعدتك  
+  - text: 😊 كنت سعيدًا بالمساعدة
+  - text: 😊 بكل سرور سأكون في خدمتك
+  - text: 😊  تسرني مساعدتك
   utter_goodbye:
   - text: وداعا أتمنى لك يوما سعيدا"
-  - text:  الى اللقاء
+  - text: الى اللقاء
   utter_asuwish:
-  - text:  .حسنا كما تريد
-  - text:  .حسناً كما تحب 
-  - text:  .حسناً كما تشاء 
-  - text:  .حسناً كما تُفَضِلُ 
-  - text:  .حسناً كما يروق لك 
+  - text: .حسنا كما تريد
+  - text: .حسناً كما تحب
+  - text: .حسناً كما تشاء
+  - text: .حسناً كما تُفَضِلُ
+  - text: .حسناً كما يروق لك
   utter_iamabot:
   - text: أنا مساعدك الرقمي في هذه الدورة التكوينية، ويمكنني الرد على إستفساراتك المتعلقة بالإحصاء وفقًا لقاعدة البيانات المتوفرة
-
-  # utter_instructions:
-  # - text: .الرجاء تقديم سؤالك بدقة أو إستخدام كلمات مفتاحية لتحديد موضوع استفسارك
+  utter_new:
+  - text: .لو سمحت، قدم سؤال
+actions:
+- action_stop_navigation
+- action_get_user_question
+- action_get_module_id
+- action_get_situations
+- action_get_questions
+- action_get_situation_id
+- action_get_question_id
+- action_get_response
+- action_reselect_module
+- action_utter_module_buttons
+- action_log_conversation
+- action_get_module_definitions2
