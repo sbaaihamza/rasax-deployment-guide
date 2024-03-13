@@ -68,7 +68,7 @@ class ActionReselectModule(Action):
         # Try reading the user track from Excel file
         try:
             my_dataframe_slot = tracker.get_slot('my_dataframe_slot')
-            df_recommendations  = provide_recommendations(user_message_all, my_dataframe_slot,THRESH=0.3, n=1000, unique_values_dict=unique_values_dict, BERT_weights=BERT_weights,n_module=n_module)
+            df_recommendations  = provide_recommendations("user_message_all", my_dataframe_slot, THRESH=0.3, n=1000, unique_values_dict=unique_values_dict, BERT_weights=BERT_weights,n_module=n_module)
 #pd.read_json(my_dataframe_slot, orient='split')            
         except Exception as e:
             print(e)
@@ -110,7 +110,7 @@ class ActionGet_Situations(Action):
     def run(self, dispatcher, tracker, domain):
         try:
             my_dataframe_slot = tracker.get_slot('my_dataframe_slot')
-            df_rslt  = provide_recommendations(user_message_all, my_dataframe_slot,THRESH=0.3, n=1000, unique_values_dict=unique_values_dict, BERT_weights=BERT_weights,n_module=n_module)
+            df_rslt  = provide_recommendations("user_message_all", my_dataframe_slot,THRESH=0.3, n=1000, unique_values_dict=unique_values_dict, BERT_weights=BERT_weights,n_module=n_module)
             #df_rslt = pd.read_json(my_dataframe_slot, orient='split')
             try:
                 module_number = tracker.get_slot('module_id')
@@ -161,7 +161,7 @@ class ActionGet_Questions(Action):
 
         try:
             my_dataframe_slot = tracker.get_slot('my_dataframe_slot')
-            df_rslt  = provide_recommendations(user_message_all, my_dataframe_slot,THRESH=0.3, n=1000, unique_values_dict=unique_values_dict, BERT_weights=BERT_weights,n_module=n_module)
+            df_rslt  = provide_recommendations("user_message_all", my_dataframe_slot,THRESH=0.3, n=1000, unique_values_dict=unique_values_dict, BERT_weights=BERT_weights,n_module=n_module)
             # df_rslt = pd.read_json(my_dataframe_slot, orient='split')
         except Exception as e:
             print(e)
