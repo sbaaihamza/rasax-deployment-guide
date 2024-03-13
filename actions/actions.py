@@ -259,43 +259,44 @@ class ActionGetModuleDefinitions2(Action):
         return []
 
 ### to remove this action later
-# class LogConversation(Action):
-#     def name(self) -> Text:
-#         return "action_log_conversation"
 
-#     def run(
-#         self,
-#         dispatcher: CollectingDispatcher,
-#         tracker: Tracker,
-#         domain: Dict[Text, Any],
-#     ) -> List[Dict[Text, Any]]:
-#         # Extract conversation data with message types and sender IDs
-#         sender_id = tracker.sender_id
-#         conversation_data = []
+class LogConversation(Action):
+    def name(self) -> Text:
+        return "action_log_conversation"
 
-#         for event in tracker.events:
-#             if 'text' in event:
-#                 message = event['text']
-#                 message_type = 'user' if event['event'] == "user" else 'bot'
-#                 time = event.get('timestamp', '')
-#                 conversation_data.append({'sender_id': sender_id, 'message': message, 'message_type': message_type, 'Time': time})
+    def run(
+        self,
+        dispatcher: CollectingDispatcher,
+        tracker: Tracker,
+        domain: Dict[Text, Any],
+    ) -> List[Dict[Text, Any]]:
+        # Extract conversation data with message types and sender IDs
+        sender_id = tracker.sender_id
+        conversation_data = []
 
-#         # Format the date and time
-#         current_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        for event in tracker.events:
+            if 'text' in event:
+                message = event['text']
+                message_type = 'user' if event['event'] == "user" else 'bot'
+                time = event.get('timestamp', '')
+                conversation_data.append({'sender_id': sender_id, 'message': message, 'message_type': message_type, 'Time': time})
 
-#         # Specify the file path
-#         file_path = "conversation_log.txt"
+        # Format the date and time
+        current_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-#         # Open the file in append mode and write the formatted datetime and conversation data
-#         with open(file_path, "a", encoding="utf-8") as file:
-#             file.write(f"Timestamp: {current_datetime}\n")
-#             for entry in conversation_data:
-#                 # file.write(f"(sender_id: {entry['sender_id']}){entry['message_type'].capitalize()}: {entry['message']} (Time: {entry['Time']})\n")
-#                 file.write(f"sender_id: {entry['sender_id']} , {entry['message_type'].capitalize()}: {entry['message']} , Time: {entry['Time']}\n")
+        # Specify the file path
+        file_path = "conversation_log.txt"
 
-#             file.write("\n")  # Add a newline between conversations
+        # Open the file in append mode and write the formatted datetime and conversation data
+        with open(file_path, "a", encoding="utf-8") as file:
+            file.write(f"Timestamp: {current_datetime}\n")
+            for entry in conversation_data:
+                # file.write(f"(sender_id: {entry['sender_id']}){entry['message_type'].capitalize()}: {entry['message']} (Time: {entry['Time']})\n")
+                file.write(f"sender_id: {entry['sender_id']} , {entry['message_type'].capitalize()}: {entry['message']} , Time: {entry['Time']}\n")
 
-#         return []
+            file.write("\n")  # Add a newline between conversations
+
+        return []
     
 
     
