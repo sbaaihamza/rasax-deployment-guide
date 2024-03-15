@@ -36,28 +36,33 @@ class ActionGetUserQuestion(Action):
         return "action_get_user_question"
     ##new
     def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain) -> list:
-        user_message_all = tracker.latest_message.get('text')
-        input_weight=tracker.latest_message.get('embedding')
+        try:
+           user_message_all = tracker.latest_message.get('text')
+           input_weight=tracker.latest_message.get('embedding')
+        except Exception as e:
+           # print(e)
+           dispatcher.utter_message("!!!! الرجاء المحاولة مرة أخرى") 
+           return []#[SlotSet("user_question", user_message_all)]
         # print("######tracker.latest_message",input_weight)
         # Generate recommendations
         try:
             df_recommendations = provide_recommendations(user_message_all, input_weight,THRESH=0.3, n=1000, unique_values_dict=unique_values_dict, BERT_weights=BERT_weights,n_module=n_module)
             dataframe_json = df_recommendations.to_json(orient='split')
         except Exception as e:
-            print(e)
+            # print(e)
             dispatcher.utter_message("!! الرجاء المحاولة مرة أخرى") 
-            return [SlotSet("user_question", user_message_all)]
+            return [] #[SlotSet("user_question", user_message_all)]
         # Handle the case where no recommendations are found
         if df_recommendations.empty:
             dispatcher.utter_message("من فضلك أعد صياغة سؤالك")
-            return [SlotSet("user_question", user_message_all)]
+            return [] #[SlotSet("user_question", user_message_all)]
         # Generate and send module buttons
         module_ids, module_names = module_recommendations(df_recommendations, n=n_module)
         button_list = [{"title": name, "payload": f'/inform_module{{"module_id":"{str(module_id)}"}}'} for module_id, name in zip(module_ids, module_names)]
         dispatcher.utter_message(text="اختر الوحدة المتعلقة بسؤالك", buttons=button_list)
 
         # Set the user_question value in a slot for future use
-        return [SlotSet("user_question", user_message_all) , SlotSet("my_dataframe_slot",input_weight)]#SlotSet("my_dataframe_slot", dataframe_json)]   
+        return [ SlotSet("my_dataframe_slot",input_weight)]#[SlotSet("user_question", user_message_all) , SlotSet("my_dataframe_slot",input_weight)]#SlotSet("my_dataframe_slot", dataframe_json)]   
 
 class ActionReselectModule(Action):
     def name(self) -> str:
@@ -71,7 +76,7 @@ class ActionReselectModule(Action):
             df_recommendations  = provide_recommendations("user_message_all", my_dataframe_slot, THRESH=0.3, n=1000, unique_values_dict=unique_values_dict, BERT_weights=BERT_weights,n_module=n_module)
 #pd.read_json(my_dataframe_slot, orient='split')            
         except Exception as e:
-            print(e)
+            # print(e)
             dispatcher.utter_message(" !! خلل في تحميل البيانات")
             return []
         # Handle the case where no resp are found
@@ -124,11 +129,11 @@ class ActionGet_Situations(Action):
                     dispatcher.utter_message(text= "اختر السياق الأقرب إلى سؤالك",buttons=button_list)
                 return []
             except Exception as e:
-                print(e)
+                # print(e)
                 dispatcher.utter_message("!! الرجاء المحاولة مرة أخرى") 
                 return [] 
         except Exception as e:
-            print(e)
+            # print(e)
             dispatcher.utter_message(" !! خلل في تحميل البيانات")
             return []
                        
@@ -164,7 +169,7 @@ class ActionGet_Questions(Action):
             df_rslt  = provide_recommendations("user_message_all", my_dataframe_slot,THRESH=0.3, n=1000, unique_values_dict=unique_values_dict, BERT_weights=BERT_weights,n_module=n_module)
             # df_rslt = pd.read_json(my_dataframe_slot, orient='split')
         except Exception as e:
-            print(e)
+            # print(e)
             dispatcher.utter_message(" !! خلل في تحميل البيانات")
             return []
         try:
@@ -172,13 +177,12 @@ class ActionGet_Questions(Action):
             question_ids,question_names,reste,reste_question=question_recommendations(df_rslt,int(situation_number),n=n_question)
 
         except Exception as e:
-            print(e)
+            # print(e)
             dispatcher.utter_message(" !! الرجاء المحاولة مرة أخرة ")
             return []
         if question_ids==[]:
-                        dispatcher.utter_message("لا يوجد سؤال متاح في هذا السياق")
+            dispatcher.utter_message("لا يوجد سؤال متاح في هذا السياق")
         else:
-
             random.shuffle(choose_qst_variations)
             button_list = [{"title": question_names[i], "payload": f'/inform_question{{"question_id":"{str(question_ids[i])}"}}' } for i in range(len(question_ids))]
             dispatcher.utter_message(text= choose_qst_variations[0],buttons=button_list)
@@ -211,7 +215,7 @@ class ActionGet_Response(Action):
             response=get_responses(int(question_number))
 
         except Exception as e:
-            print(e)
+            # print(e)
             dispatcher.utter_message("!! الرجاء المحاولة مرة أخرى") 
             return []          
         # Use the ID in your action logic
@@ -271,30 +275,30 @@ class LogConversation(Action):
         domain: Dict[Text, Any],
     ) -> List[Dict[Text, Any]]:
         # Extract conversation data with message types and sender IDs
-        sender_id = tracker.sender_id
-        conversation_data = []
+        # sender_id = tracker.sender_id
+        # conversation_data = []
 
-        for event in tracker.events:
-            if 'text' in event:
-                message = event['text']
-                message_type = 'user' if event['event'] == "user" else 'bot'
-                time = event.get('timestamp', '')
-                conversation_data.append({'sender_id': sender_id, 'message': message, 'message_type': message_type, 'Time': time})
+        # for event in tracker.events:
+        #     if 'text' in event:
+        #         message = event['text']
+        #         message_type = 'user' if event['event'] == "user" else 'bot'
+        #         time = event.get('timestamp', '')
+        #         conversation_data.append({'sender_id': sender_id, 'message': message, 'message_type': message_type, 'Time': time})
 
-        # Format the date and time
-        current_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        # # Format the date and time
+        # current_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-        # Specify the file path
-        file_path = "conversation_log.txt"
+        # # Specify the file path
+        # file_path = "conversation_log.txt"
 
-        # Open the file in append mode and write the formatted datetime and conversation data
-        with open(file_path, "a", encoding="utf-8") as file:
-            file.write(f"Timestamp: {current_datetime}\n")
-            for entry in conversation_data:
-                # file.write(f"(sender_id: {entry['sender_id']}){entry['message_type'].capitalize()}: {entry['message']} (Time: {entry['Time']})\n")
-                file.write(f"sender_id: {entry['sender_id']} , {entry['message_type'].capitalize()}: {entry['message']} , Time: {entry['Time']}\n")
+        # # Open the file in append mode and write the formatted datetime and conversation data
+        # with open(file_path, "a", encoding="utf-8") as file:
+        #     file.write(f"Timestamp: {current_datetime}\n")
+        #     for entry in conversation_data:
+        #         # file.write(f"(sender_id: {entry['sender_id']}){entry['message_type'].capitalize()}: {entry['message']} (Time: {entry['Time']})\n")
+        #         file.write(f"sender_id: {entry['sender_id']} , {entry['message_type'].capitalize()}: {entry['message']} , Time: {entry['Time']}\n")
 
-            file.write("\n")  # Add a newline between conversations
+        #     file.write("\n")  # Add a newline between conversations
 
         return []
     
