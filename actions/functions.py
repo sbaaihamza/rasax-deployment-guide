@@ -73,11 +73,11 @@ def provide_recommendations(user_input,input_weight,THRESH, n, unique_values_dic
     # Create a list of dictionaries for each situation
     ordred_situations_IDs = []
     for i in filtered_indices:
-        situation_text = situations_list[i]
-        unique_value = unique_values_dict[situation_text]
+        # situation_text = situations_list[i]
+        unique_value = unique_values_dict[situations_list[i]]
         ordred_situations_IDs.append({
-            'input_text': user_input,
-            'similar_text': situation_text,
+            # 'input_text': user_input,
+            # 'similar_text': situation_text,
             'element_ID': unique_value[0],
             'module_ID': unique_value[1],
             'situation_ID': unique_value[2],
