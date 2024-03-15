@@ -47,7 +47,7 @@ class ActionGetUserQuestion(Action):
         # Generate recommendations
         try:
             df_recommendations = provide_recommendations(user_message_all, input_weight,THRESH=0.3, n=1000, unique_values_dict=unique_values_dict, BERT_weights=BERT_weights,n_module=n_module)
-            dataframe_json = df_recommendations.to_json(orient='split')
+            # dataframe_json = df_recommendations.to_json(orient='split')
         except Exception as e:
             # print(e)
             dispatcher.utter_message("!! الرجاء المحاولة مرة أخرى") 
