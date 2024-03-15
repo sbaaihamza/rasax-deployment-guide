@@ -85,8 +85,7 @@ class ActionReselectModule(Action):
             return []
         # Generate and send module buttons
         module_ids, module_names = module_recommendations(df_recommendations, n=n_module)
-        button_list = [{"title": name, "payload": f'/inform_module{{"module_id":"{module_id}"}}'} 
-                    for module_id, name in zip(module_ids, module_names)]
+        button_list = [{"title": name, "payload": f'/inform_module{{"module_id":"{module_id}"}}'} for module_id, name in zip(module_ids, module_names)]
         dispatcher.utter_message(text="اختر الوحدة المتعلقة بسؤالك", buttons=button_list)
         return []
     
