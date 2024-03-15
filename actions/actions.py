@@ -47,7 +47,7 @@ class ActionGetUserQuestion(Action):
         # Generate recommendations
         try:
             df_recommendations = provide_recommendations(user_message_all, input_weight,THRESH=0.3, n=1000, unique_values_dict=unique_values_dict, BERT_weights=BERT_weights,n_module=n_module)
-            # dataframe_json = df_recommendations.to_json(orient='split')
+            dataframe_json = df_recommendations.to_json(orient='split')
         except Exception as e:
             # print(e)
             dispatcher.utter_message("!! الرجاء المحاولة مرة أخرى") 
@@ -62,8 +62,8 @@ class ActionGetUserQuestion(Action):
         dispatcher.utter_message(text="اختر الوحدة المتعلقة بسؤالك", buttons=button_list)
 
         # Set the user_question value in a slot for future use
-        return [ SlotSet("my_dataframe_slot",input_weight)]#[SlotSet("user_question", user_message_all) , SlotSet("my_dataframe_slot",input_weight)]#SlotSet("my_dataframe_slot", dataframe_json)]   
-
+        # return [ SlotSet("my_dataframe_slot",input_weight)]#[SlotSet("user_question", user_message_all) , SlotSet("my_dataframe_slot",input_weight)]#SlotSet("my_dataframe_slot", dataframe_json)]   
+        return [SlotSet("my_dataframe_slot", dataframe_json)] 
 class ActionReselectModule(Action):
     def name(self) -> str:
         return "action_reselect_module"
@@ -73,8 +73,8 @@ class ActionReselectModule(Action):
         # Try reading the user track from Excel file
         try:
             my_dataframe_slot = tracker.get_slot('my_dataframe_slot')
-            df_recommendations  = provide_recommendations("user_message_all", my_dataframe_slot, THRESH=0.3, n=1000, unique_values_dict=unique_values_dict, BERT_weights=BERT_weights,n_module=n_module)
-#pd.read_json(my_dataframe_slot, orient='split')            
+            # df_recommendations  = provide_recommendations("user_message_all", my_dataframe_slot, THRESH=0.3, n=1000, unique_values_dict=unique_values_dict, BERT_weights=BERT_weights,n_module=n_module)
+            df_recommendations  = pd.read_json(my_dataframe_slot, orient='split')            
         except Exception as e:
             # print(e)
             dispatcher.utter_message(" !! خلل في تحميل البيانات")
@@ -115,8 +115,8 @@ class ActionGet_Situations(Action):
     def run(self, dispatcher, tracker, domain):
         try:
             my_dataframe_slot = tracker.get_slot('my_dataframe_slot')
-            df_rslt  = provide_recommendations("user_message_all", my_dataframe_slot,THRESH=0.3, n=1000, unique_values_dict=unique_values_dict, BERT_weights=BERT_weights,n_module=n_module)
-            #df_rslt = pd.read_json(my_dataframe_slot, orient='split')
+            # df_rslt  = provide_recommendations("user_message_all", my_dataframe_slot,THRESH=0.3, n=1000, unique_values_dict=unique_values_dict, BERT_weights=BERT_weights,n_module=n_module)
+            df_rslt = pd.read_json(my_dataframe_slot, orient='split')
             try:
                 module_number = tracker.get_slot('module_id')
                 situation_ids,situation_names=situation_recommendations(df_rslt,int(module_number),n=n_situation)
@@ -166,8 +166,8 @@ class ActionGet_Questions(Action):
 
         try:
             my_dataframe_slot = tracker.get_slot('my_dataframe_slot')
-            df_rslt  = provide_recommendations("user_message_all", my_dataframe_slot,THRESH=0.3, n=1000, unique_values_dict=unique_values_dict, BERT_weights=BERT_weights,n_module=n_module)
-            # df_rslt = pd.read_json(my_dataframe_slot, orient='split')
+            # df_rslt  = provide_recommendations("user_message_all", my_dataframe_slot,THRESH=0.3, n=1000, unique_values_dict=unique_values_dict, BERT_weights=BERT_weights,n_module=n_module)
+            df_rslt = pd.read_json(my_dataframe_slot, orient='split')
         except Exception as e:
             # print(e)
             dispatcher.utter_message(" !! خلل في تحميل البيانات")
