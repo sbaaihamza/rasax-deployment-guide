@@ -5,7 +5,6 @@ import logging
 from typing import Any, Text, List, Dict, Tuple, Type
 import tensorflow as tf
 
-
 from rasa.engine.graph import ExecutionContext, GraphComponent
 from rasa.engine.recipes.default_recipe import DefaultV1Recipe
 from rasa.engine.storage.resource import Resource
